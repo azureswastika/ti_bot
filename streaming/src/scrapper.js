@@ -25,5 +25,5 @@ function parseScript(response) {
 }
 
 export function getTickerId(url) {
-  return axios.get(`${baseUrl}${url}`).then((response) => parseScript(response));
+  return axios.get(`${baseUrl}${url}`).then((response) => parseScript(response)).catch(() => {});
 }
