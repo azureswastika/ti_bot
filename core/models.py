@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class Ticker(BaseModel):
     _id: Any
     name: str
-    # api: str
+    api: int
 
 
 class TickerBundle(BaseModel):

@@ -1,10 +1,6 @@
-import json
-from threading import Thread
-
 from websocket import WebSocketApp, enableTrace
 
 from core import Mongo
-from core.models import Ticker, TickerBundle
 
 mongo = Mongo()
 tickers = mongo.get_collection("tickers")
@@ -24,14 +20,10 @@ class Streaming:
 
     def run(self):
         """Run websocket"""
-        Thread(target=self.ws.run_forever).start()
+        self.ws.run_forever()
 
     def on_open(self, ws: WebSocketApp):
         """On websocket open"""
-        tickers_list = {
-            "command": "subscribe_tickers"}
-        tickers_list.update(TickerBundle(tickers=[Ticker(**i) for i in tickers.select()]).dict())
-        ws.send(json.dumps(tickers_list))
 
     def on_message(self, ws: WebSocketApp, message: str):
         """On websocket message"""

@@ -1,9 +1,17 @@
-const ws = require('nodejs-websocket');
+import { createServer } from 'nodejs-websocket';
+// eslint-disable-next-line import/extensions
+import { getTickerPage, getTickerId } from './src/scrapper.js';
 
-const server = ws.createServer((conn) => {
+const server = createServer((conn) => {
   conn.on('text', (message) => {
-    if (message.command === 'search') {
-      //
+    const msg = JSON.parse(message);
+    switch (msg.command) {
+      case 'search':
+        getTickerPage(msg.data).then((url) => getTickerId(url).then((tickerId) => conn.sendText(JSON.stringify({ command: 'search', data: { ticker: msg.data, id: tickerId } }))));
+        break;
+      default:
+        conn.sendText();
+        break;
     }
   });
   conn.on('close', (code, reason) => {
