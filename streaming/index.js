@@ -1,21 +1,21 @@
 import { createServer } from 'nodejs-websocket';
 // eslint-disable-next-line import/extensions
-import { getTickerPage, getTickerId } from './src/scrapper.js';
+import { search, defaultError } from './src/websocket.js';
 
 const server = createServer((conn) => {
   conn.on('text', (message) => {
     const msg = JSON.parse(message);
-    switch (msg.command) {
+    switch (msg.type) {
       case 'search':
-        getTickerPage(msg.data).then((url) => getTickerId(url).then((tickerId) => conn.sendText(JSON.stringify({ command: 'search', data: { ticker: msg.data, id: tickerId } }))));
+        search(conn, msg);
         break;
       default:
-        conn.sendText();
+        defaultError(conn, msg);
         break;
     }
   });
   conn.on('close', (code, reason) => {
-    console.log(code, reason);
+    console.log(`Disconnection code: ${code} ${reason}`);
   });
 }).listen(3000);
 

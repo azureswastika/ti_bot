@@ -30,3 +30,7 @@ class MongoCollection:
 
     def update(self, ffilter: dict, update: dict):
         return self.collection.update_one(ffilter, update)
+
+
+mongo = Mongo()
+tickers = mongo.get_collection("tickers")

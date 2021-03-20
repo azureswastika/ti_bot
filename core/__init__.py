@@ -1,1 +1,1 @@
-from .mongo import Mongo, MongoCollection
+from .mongo import tickers

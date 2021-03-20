@@ -1,13 +1,14 @@
+from threading import Thread
+
+from telegram import Update
+from telegram.ext import CallbackContext, CommandHandler, Updater
 from websocket import WebSocketApp, enableTrace
 
-from core import Mongo
 
-mongo = Mongo()
-tickers = mongo.get_collection("tickers")
-
-
-class Streaming:
+class Listener:
     def __init__(self, host="127.0.0.1", port=3000, traceability=False) -> None:
+        from os import environ
+
         self.ws = WebSocketApp(
             f"ws://{host}:{port}",
             on_open=self.on_open,
@@ -18,9 +19,21 @@ class Streaming:
         if traceability:
             enableTrace(True)
 
+        self.updater = Updater(environ.get("TG_TOKEN"))
+        self.dispatcher = self.updater.dispatcher
+        self.dispatcher.add_handler(CommandHandler("start", self.start))
+        self.dispatcher.add_handler(CommandHandler("ticker", self.ticker))
+
     def run(self):
         """Run websocket"""
-        self.ws.run_forever()
+        Thread(target=self.ws.run_forever).start()
+        Thread(target=self.updater.start_polling).start()
+        self.updater.idle()
+
+    def start(self, update: Update, _: CallbackContext):
+        update.message.reply_text(
+            "Use /subscribe <ticker> to subscribe on the ticker changes"
+        )
 
     def on_open(self, ws: WebSocketApp):
         """On websocket open"""
@@ -37,5 +50,5 @@ class Streaming:
 
 
 if __name__ == "__main__":
-    main = Streaming()
+    main = Listener()
     main.run()
