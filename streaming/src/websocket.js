@@ -1,5 +1,7 @@
-// eslint-disable-next-line import/extensions
+/* eslint-disable import/named */
+/* eslint-disable import/extensions */
 import { getTickerPage, getTickerId } from './scrapper.js';
+import { SearchConstructor, SearchErrorConstructor } from './constructors.js';
 
 export function search(conn, data) {
   getTickerPage(data.ticker.name).then(
@@ -7,31 +9,11 @@ export function search(conn, data) {
       (tickerId) => {
         if (url) {
           conn.sendText(
-            JSON.stringify(
-              {
-                type: 'search',
-                data: {
-                  chat: data.chat,
-                  ticker: {
-                    id: tickerId,
-                    name: data.ticker.name,
-                  },
-                },
-              },
-            ),
+            JSON.stringify(SearchConstructor(data.chat, tickerId, data.ticker.name)),
           );
         } else {
           conn.sendText(
-            JSON.stringify(
-              {
-                type: 'search-error',
-                data: {
-                  ticker: {
-                    name: data.ticker.name,
-                  },
-                },
-              },
-            ),
+            JSON.stringify(SearchErrorConstructor(data.ticker.name)),
           );
         }
       },
