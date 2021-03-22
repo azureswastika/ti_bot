@@ -1,13 +1,10 @@
-from typing import Any
-
 from pydantic import BaseModel
 
 
-class Ticker(BaseModel):
-    _id: Any
+class TickerModel(BaseModel):
+    id: int
     name: str
-    api: int = None
 
 
-class TickerBundle(BaseModel):
-    tickers: list[Ticker]
+class TickerBundleModel(BaseModel):
+    tickers: list[TickerModel]

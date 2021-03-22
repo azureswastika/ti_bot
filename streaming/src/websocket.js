@@ -1,20 +1,40 @@
 // eslint-disable-next-line import/extensions
 import { getTickerPage, getTickerId } from './scrapper.js';
 
-export function search(conn, msg) {
-  getTickerPage(msg.data).then(
+export function search(conn, data) {
+  getTickerPage(data.ticker.name).then(
     (url) => getTickerId(url).then(
-      (tickerId) => conn.sendText(
-        JSON.stringify(
-          {
-            type: 'search',
-            data: {
-              ticker: msg.data,
-              id: tickerId,
-            },
-          },
-        ),
-      ),
+      (tickerId) => {
+        if (url) {
+          conn.sendText(
+            JSON.stringify(
+              {
+                type: 'search',
+                data: {
+                  chat: data.chat,
+                  ticker: {
+                    id: tickerId,
+                    name: data.ticker.name,
+                  },
+                },
+              },
+            ),
+          );
+        } else {
+          conn.sendText(
+            JSON.stringify(
+              {
+                type: 'search-error',
+                data: {
+                  ticker: {
+                    name: data.ticker.name,
+                  },
+                },
+              },
+            ),
+          );
+        }
+      },
     ),
   );
 }
